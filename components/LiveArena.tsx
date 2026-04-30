@@ -11,6 +11,7 @@ interface LiveArenaProps {
   answers: Answer[];
   isRevealed: boolean;
   startedAt: string | null;
+  timeLimitMs?: number;
 }
 
 export default function LiveArena({
@@ -19,26 +20,31 @@ export default function LiveArena({
   answers,
   isRevealed,
   startedAt,
+  timeLimitMs = 10000,
 }: LiveArenaProps) {
-  const playerMap = Object.fromEntries(players.map((p) => [p.id, p]));
-
+  const playerAnswers = Object.fromEntries(answers.map((a) => [a.player_id, a]));
   const countA = answers.filter((a) => a.choice === 'A').length;
   const countB = answers.filter((a) => a.choice === 'B').length;
 
-  // Map players to their choices
-  const playerAnswers = Object.fromEntries(answers.map((a) => [a.player_id, a]));
+  const groupIndexMap: Record<string, number> = {};
+  let aIdx = 0, bIdx = 0, unIdx = 0;
+  players.forEach((p) => {
+    const choice = playerAnswers[p.id]?.choice;
+    if (choice === 'A') groupIndexMap[p.id] = aIdx++;
+    else if (choice === 'B') groupIndexMap[p.id] = bIdx++;
+    else groupIndexMap[p.id] = unIdx++;
+  });
 
   return (
     <div className="relative flex h-full flex-col items-center justify-center overflow-hidden select-none">
-      {/* Background particles */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {Array.from({ length: 20 }).map((_, i) => (
+        {Array.from({ length: 18 }).map((_, i) => (
           <div
             key={i}
-            className="absolute rounded-full opacity-20"
+            className="absolute rounded-full opacity-15"
             style={{
-              width: Math.random() * 6 + 2,
-              height: Math.random() * 6 + 2,
+              width: Math.random() * 5 + 2,
+              height: Math.random() * 5 + 2,
               background: i % 2 === 0 ? '#06b6d4' : '#a855f7',
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -49,22 +55,18 @@ export default function LiveArena({
         ))}
       </div>
 
-      {/* Question text */}
       <div
         className="mb-10 max-w-3xl rounded-3xl px-10 py-6 text-center text-2xl font-bold text-white"
         style={{
-          background: 'rgba(255,255,255,0.07)',
-          border: '1px solid rgba(255,255,255,0.12)',
+          background: 'rgba(255,255,255,0.06)',
+          border: '1px solid rgba(255,255,255,0.10)',
           backdropFilter: 'blur(10px)',
-          boxShadow: '0 0 60px rgba(6,182,212,0.1)',
         }}
       >
         {question.text}
       </div>
 
-      {/* Portals + Timer row */}
-      <div className="relative flex items-center gap-24">
-        {/* Portal A */}
+      <div className="relative flex items-center gap-20">
         <Portal
           label="A"
           optionText={question.option_a}
@@ -74,29 +76,25 @@ export default function LiveArena({
           count={countA}
         />
 
-        {/* Timer in center */}
         <div className="flex flex-col items-center gap-2">
           {!isRevealed && (
-            <TimerRing
-              durationMs={10000}
-              startedAt={startedAt}
-              size={100}
-            />
+            <TimerRing durationMs={timeLimitMs} startedAt={startedAt} size={100} />
           )}
           {isRevealed && (
             <div className="text-center">
-              <div className="text-5xl">🏆</div>
-              <div className="mt-2 text-lg font-bold text-yellow-400">
+              <div className="text-4xl font-black" style={{ color: '#f59e0b', textShadow: '0 0 20px rgba(245,158,11,0.7)' }}>
+                ★
+              </div>
+              <div className="mt-2 text-base font-bold text-yellow-400 max-w-[120px] text-center">
                 {question.correct_choice === 'A' ? question.option_a : question.option_b}
               </div>
             </div>
           )}
-          <div className="text-xs text-white/40 mt-1">
+          <div className="text-xs text-white/35 mt-1">
             {answers.length} / {players.length} أجابوا
           </div>
         </div>
 
-        {/* Portal B */}
         <Portal
           label="B"
           optionText={question.option_b}
@@ -106,7 +104,6 @@ export default function LiveArena({
           count={countB}
         />
 
-        {/* Player orbs floating in arena */}
         <div
           className="pointer-events-none absolute"
           style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
@@ -119,6 +116,7 @@ export default function LiveArena({
                 name={player.name}
                 choice={ans?.choice ?? null}
                 index={i}
+                groupIndex={groupIndexMap[player.id] ?? i}
                 isRevealed={isRevealed}
                 isCorrect={ans?.is_correct ?? false}
                 score={ans?.score_earned}
