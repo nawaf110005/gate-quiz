@@ -1,7 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
 import Matter from 'matter-js';
-import './FallingText.css';
-
 const FallingText = ({
   className = '',
   text = '',

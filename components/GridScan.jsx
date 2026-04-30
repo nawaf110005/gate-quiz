@@ -1,9 +1,8 @@
-import * as faceapi from 'face-api.js';
 import { BloomEffect, ChromaticAberrationEffect, EffectComposer, EffectPass, RenderPass } from 'postprocessing';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import './GridScan.css';
-
+// face-api.js stubbed — face detection disabled for decorative use
+const faceapi = { nets: { tinyFaceDetector: { loadFromUri: async () => {} }, faceLandmark68TinyNet: { loadFromUri: async () => {} } }, TinyFaceDetectorOptions: class {}, detectSingleFace: async () => null };
 const vert = `
 varying vec2 vUv;
 void main(){
