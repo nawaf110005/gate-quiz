@@ -45,7 +45,6 @@ export default function Stepper({
 
   return (
     <div className={stepContainerClassName}>
-      {/* Step circles */}
       <div className={`flex items-center gap-2 ${stepCircleContainerClassName}`}>
         {steps.map((_, i) => {
           const stepNum = i + 1;
@@ -77,7 +76,9 @@ export default function Stepper({
                   flexShrink: 0,
                 }}
               >
-                {!disableStepIndicators && (renderStepIndicator ? renderStepIndicator({ step: stepNum, isActive, isCompleted }) : stepNum)}
+                {!disableStepIndicators && (renderStepIndicator
+                  ? renderStepIndicator({ step: stepNum, isActive, isCompleted })
+                  : stepNum)}
               </motion.div>
               {i < steps.length - 1 && (
                 <motion.div
@@ -90,12 +91,10 @@ export default function Stepper({
         })}
       </div>
 
-      {/* Step content */}
       <div className={contentClassName}>
         {steps[currentStep - 1]}
       </div>
 
-      {/* Footer */}
       <div className={footerClassName}>
         {currentStep > 1 && (
           <button onClick={handleBack} {...backButtonProps}>{backButtonText}</button>
