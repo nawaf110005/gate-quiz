@@ -23,6 +23,7 @@ export default function DisplayPage() {
   const [currentQ, setCurrentQ] = useState<Question | null>(null);
   const [allAnswers, setAllAnswers] = useState<any[]>([]);
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
+  const [timeLimitMs, setTimeLimitMs] = useState(10000);
 
   useEffect(() => {
     if (!session?.current_question_id) return;
@@ -33,6 +34,12 @@ export default function DisplayPage() {
       .single()
       .then(({ data }) => { if (data) setCurrentQ(data); });
   }, [session?.current_question_id]);
+
+  useEffect(() => {
+    if (!session?.game_id) return;
+    supabase.from('games').select('time_per_question').eq('id', session.game_id).single()
+      .then(({ data }) => { if (data?.time_per_question) setTimeLimitMs(data.time_per_question); });
+  }, [session?.game_id]);
 
   useEffect(() => {
     if (!session?.id) return;
@@ -56,7 +63,7 @@ export default function DisplayPage() {
         {loading ? (
           <div className="text-white/30">جاري التحميل…</div>
         ) : (
-          <div className="text-white/30">لم يتم العثور على الجلسة: {code}</div>
+          <div className="text-white/30">لم يتم الع+kور على الجمسة: {code}</div>
         )}
       </div>
     );
@@ -201,6 +208,7 @@ export default function DisplayPage() {
               answers={answers}
               isRevealed={session.status === 'revealing'}
               startedAt={session.question_started_at}
+              timeLimitMs={timeLimitMs}
             />
           </motion.div>
         )}
@@ -218,7 +226,7 @@ export default function DisplayPage() {
               className="text-5xl font-black"
               style={{ color: '#f59e0b', textShadow: '0 0 40px rgba(245,158,11,0.6)' }}
             >
-              🏆 الترتيب الحالي
+              ★ الترتيب الحالي
             </h2>
             <div className="w-full max-w-2xl">
               <Leaderboard players={players} limit={10} showStats />
@@ -238,9 +246,10 @@ export default function DisplayPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 200 }}
-              className="text-8xl"
+              className="text-8xl font-black"
+              style={{ color: '#f59e0b', textShadow: '0 0 60px rgba(245,158,11,0.8)' }}
             >
-              🎉
+              ★
             </motion.div>
             <h2 className="text-5xl font-black text-white">انتهت اللعبة!</h2>
 
@@ -268,14 +277,13 @@ export default function DisplayPage() {
               {stats && (
                 <div className="col-span-2 grid grid-cols-4 gap-4">
                   {[
-                    { label: 'إجمالي الإجابات', value: stats.totalAnswers, icon: '📝' },
-                    { label: 'دقة الإجابات', value: `${stats.accuracy}%`, icon: '🎯' },
-                    { label: 'أسرع لاعب', value: stats.fastestPlayer?.name ?? '—', icon: '⚡' },
-                    { label: 'أصعب سؤال', value: stats.hardestQuestion ? `${stats.hardestQuestion.difficultyPct}%` : '—', icon: '🔥' },
+                    { label: 'إجمالي الإجابات', value: stats.totalAnswers, color: '#06b6d4' },
+                    { label: 'دقة الإجابات', value: `${stats.accuracy}%`, color: '#22c55e' },
+                    { label: 'أسرع لاعب', value: stats.fastestPlayer?.name ?? '—', color: '#f59e0b' },
+                    { label: 'أصعب سؤال', value: stats.hardestQuestion ? `${stats.hardestQuestion.difficultyPct}%` : '—', color: '#a855f7' },
                   ].map((s) => (
                     <div key={s.label} className="glass rounded-2xl p-4 text-center">
-                      <div className="text-3xl mb-1">{s.icon}</div>
-                      <div className="text-xl font-black text-white">{s.value}</div>
+                      <div className="text-xl font-black mt-1" style={{ color: s.color }}>{s.value}</div>
                       <div className="text-white/40 text-xs mt-1">{s.label}</div>
                     </div>
                   ))}
