@@ -270,7 +270,7 @@ function StartSessionButton({ gameId }: { gameId: string }) {
       className="rounded-xl px-6 py-3 font-bold text-black transition hover:scale-105 disabled:opacity-40"
       style={{ background: 'linear-gradient(135deg,#22c55e,#16a34a)' }}
     >
-      {loading ? '…' : '▶ بدء �طلسة مباشرة'}
+      {loading ? '…' : '▶ بدء جلسة مباشرة'}
     </button>
   );
 }
