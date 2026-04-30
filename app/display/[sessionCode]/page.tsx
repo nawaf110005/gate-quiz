@@ -8,10 +8,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LiveArena from '@/components/LiveArena';
 import Leaderboard from '@/components/Leaderboard';
 import { computeSessionStats } from '@/lib/logic';
+import { QRCodeSVG } from 'qrcode.react';
 
 export default function DisplayPage() {
   const { sessionCode } = useParams<{ sessionCode: string }>();
   const code = (sessionCode ?? '').toUpperCase();
+  const joinUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/play/${code}`
+    : `https://gate-quiz-rose.vercel.app/play/${code}`;
 
   const { session, loading } = useSessionByCode(code);
   const players = usePlayers(session?.id ?? '');
@@ -96,21 +100,47 @@ export default function DisplayPage() {
               transition={{ repeat: Infinity, duration: 3 }}
             >
               <div
-                className="text-[120px] font-black leading-none"
+                className="text-[90px] font-black leading-none"
                 style={{ background: 'linear-gradient(135deg,#06b6d4,#a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
               >
                 بوابة القرار
               </div>
             </motion.div>
 
-            <div className="text-center">
-              <div className="text-white/50 text-2xl mb-3">انضم الآن بالكود</div>
-              <div
-                className="text-8xl font-black tracking-widest"
-                style={{ color: '#06b6d4', textShadow: '0 0 40px rgba(6,182,212,0.8)' }}
-              >
-                {code}
+            {/* Code + QR side by side */}
+            <div className="flex items-center gap-12">
+              <div className="text-center">
+                <div className="text-white/50 text-xl mb-2">انضم بالكود</div>
+                <div
+                  className="text-7xl font-black tracking-widest"
+                  style={{ color: '#06b6d4', textShadow: '0 0 40px rgba(6,182,212,0.8)' }}
+                >
+                  {code}
+                </div>
+                <div className="text-white/30 text-sm mt-2">{joinUrl}</div>
               </div>
+
+              {/* QR Code */}
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 200, delay: 0.3 }}
+                className="flex flex-col items-center gap-3"
+              >
+                <div
+                  className="rounded-2xl p-4"
+                  style={{ background: 'white', boxShadow: '0 0 40px rgba(6,182,212,0.4)' }}
+                >
+                  <QRCodeSVG
+                    value={joinUrl}
+                    size={180}
+                    bgColor="#ffffff"
+                    fgColor="#0a0012"
+                    level="M"
+                  />
+                </div>
+                <div className="text-white/40 text-sm">امسح للانضمام</div>
+              </motion.div>
             </div>
 
             <div className="text-white/30 text-xl">
