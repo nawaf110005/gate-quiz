@@ -39,21 +39,19 @@ export default function RotatingText({
 
   const currentText = texts[index] ?? '';
 
-  // Split text into units
   const units = splitBy === 'characters'
     ? currentText.split('')
     : splitBy === 'lines'
     ? currentText.split('\n')
     : currentText.split(' ');
 
-  // Calculate stagger delays
   const getDelay = (i, total) => {
     if (staggerFrom === 'center') {
       const center = (total - 1) / 2;
       return Math.abs(i - center) * staggerDuration;
     }
     if (staggerFrom === 'last') return (total - 1 - i) * staggerDuration;
-    return i * staggerDuration; // 'first' default
+    return i * staggerDuration;
   };
 
   return (
@@ -72,9 +70,9 @@ export default function RotatingText({
               animate={animate}
               exit={exit}
               transition={{ ...transition, delay: getDelay(i, units.length) }}
-              style={{ display: 'inline-block', whiteSpace: splitBy === 'characters' ? 'pre' : 'pre' }}
+              style={{ display: 'inline-block', whiteSpace: 'pre' }}
             >
-              {unit}{splitBy === 'words' && i < units.length - 1 ? ' ' : ''}
+              {unit}{splitBy === 'words' && i < units.length - 1 ? ' ' : ''}
             </motion.span>
           ))}
         </motion.span>
