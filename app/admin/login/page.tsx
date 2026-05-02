@@ -8,6 +8,12 @@ import GridScan from '@/components/GridScan';
 const PROD_URL = 'https://gate-quiz-rose.vercel.app';
 const GOOGLE_CLIENT_ID =
   '948001311750-ir077hjprvir5d4bvr6humvh2p8k6r5g.apps.googleusercontent.com';
+// Pinned so edge function call always reaches the correct project
+const SUPABASE_URL = 'https://wdnkxlucmvrequmqksgv.supabase.co';
+const SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9' +
+  '.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indkbmt4bHVjbXZyZXF1bXFrc2d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NTc2OTQsImV4cCI6MjA5MzEzMzY5NH0' +
+  '.MmauupyyCHEyPcm4eChJAt3skKigJPiy9Jda-lJ-5mU';
 
 declare global {
   interface Window {
@@ -68,12 +74,12 @@ export default function AdminLoginPage() {
     try {
       // Edge function verifies the Google token and returns a one-time OTP
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/google-auth`,
+        `${SUPABASE_URL}/functions/v1/google-auth`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+            apikey: SUPABASE_ANON_KEY,
           },
           body: JSON.stringify({ credential: response.credential }),
         }
