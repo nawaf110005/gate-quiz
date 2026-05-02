@@ -81,7 +81,7 @@ export default function Leaderboard({ players, limit = 10, showStats = false }: 
       </AnimatePresence>
 
       {players.length === 0 && (
-        <div className="text-center text-white/30 py-10">لا يوجد لاعبون بعد…</div>
+        <div className="text-center text-white/30 py-10">No players yet…</div>
       )}
     </div>
   );

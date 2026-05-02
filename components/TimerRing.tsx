@@ -44,6 +44,7 @@ export default function TimerRing({
     pct > 0.5 ? '#22d3ee' : pct > 0.25 ? '#f59e0b' : '#ef4444';
 
   const seconds = Math.ceil(remaining / 1000);
+  const isExpired = seconds === 0;
 
   return (
     <div
@@ -78,12 +79,30 @@ export default function TimerRing({
           style={{ transition: 'stroke-dasharray 0.1s linear, stroke 0.3s' }}
         />
       </svg>
-      <span
-        className="font-bold tabular-nums"
-        style={{ fontSize: size * 0.3, color }}
-      >
-        {seconds}
-      </span>
+      {isExpired ? (
+        <span
+          className="font-black"
+          style={{
+            fontSize: size * 0.24,
+            color: '#ef4444',
+            lineHeight: 1.15,
+            textAlign: 'center',
+            display: 'inline-block',
+            animation: 'textPulseRed 0.65s ease-in-out infinite',
+            letterSpacing: '-0.02em',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          TIME&apos;S<br />UP!
+        </span>
+      ) : (
+        <span
+          className="font-bold tabular-nums"
+          style={{ fontSize: size * 0.3, color }}
+        >
+          {seconds}
+        </span>
+      )}
     </div>
   );
 }

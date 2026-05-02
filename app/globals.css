@@ -20,7 +20,7 @@ body {
   background: var(--gate-bg);
   color: white;
   font-family: 'Cairo', sans-serif;
-  direction: rtl;
+  direction: ltr;
 }
 
 @keyframes orbFloat {
@@ -31,6 +31,12 @@ body {
 @keyframes pulseGlow {
   0%, 100% { box-shadow: 0 0 20px rgba(6,182,212,0.5); }
   50% { box-shadow: 0 0 60px rgba(6,182,212,1), 0 0 120px rgba(6,182,212,0.3); }
+}
+
+/* For TimerRing TIME'S UP text glow */
+@keyframes textPulseRed {
+  0%, 100% { opacity: 1; text-shadow: 0 0 12px rgba(239,68,68,0.9), 0 0 28px rgba(239,68,68,0.5); }
+  50%       { opacity: 0.85; text-shadow: 0 0 24px rgba(239,68,68,1), 0 0 48px rgba(239,68,68,0.7), 0 0 80px rgba(239,68,68,0.3); }
 }
 
 .gate-bg {
@@ -54,7 +60,36 @@ body {
   border: 1px solid rgba(255,255,255,0.1);
 }
 
-/* Scrollbar */
+/* ── iOS Glass ─────────────────────────────────────────────────────────────── */
+.ios-glass {
+  background: rgba(14, 10, 28, 0.70);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* ── Grid Scan animation ───────────────────────────────────────────────────── */
+@keyframes gridScanBeam {
+  0%   { top: -180px; }
+  100% { top: 100%; }
+}
+@keyframes gridScanEdge {
+  0%   { top: -2px; }
+  100% { top: 100%; }
+}
+
+.grid-scan-beam {
+  animation: gridScanBeam linear infinite;
+}
+.grid-scan-edge {
+  animation: gridScanEdge linear infinite;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.4); border-radius: 3px; }

@@ -1,9 +1,9 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 
-export default function PlayRedirect() {
+function PlayRedirectInner() {
   const params = useSearchParams();
   const router = useRouter();
   const code = params.get('code');
@@ -16,7 +16,19 @@ export default function PlayRedirect() {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="text-white/40">جاري التوجيه…</div>
+      <div className="text-white/40">Redirecting…</div>
     </div>
+  );
+}
+
+export default function PlayRedirect() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-white/40">Redirecting…</div>
+      </div>
+    }>
+      <PlayRedirectInner />
+    </Suspense>
   );
 }

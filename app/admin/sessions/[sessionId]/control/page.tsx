@@ -104,7 +104,7 @@ export default function ControlPage() {
   };
   const endGame = () => updateSession({ status: 'finished' });
 
-  if (!session) return <div className="min-h-screen flex items-center justify-center text-white/40">جاري التحميل…</div>;
+  if (!session) return <div className="min-h-screen flex items-center justify-center text-white/40">Loading…</div>;
 
   const qIdx = session.current_question_index;
   const hasMore = qIdx + 1 < questions.length;
@@ -114,9 +114,9 @@ export default function ControlPage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/admin" className="text-white/40 hover:text-white/70">← الرجوع</Link>
+          <Link href="/admin" className="text-white/40 hover:text-white/70">← Back</Link>
           <div>
-            <h1 className="text-2xl font-black text-white">التحكم بالجلسة</h1>
+            <h1 className="text-2xl font-black text-white">Session Control</h1>
             <div className="flex items-center gap-3 mt-1">
               <span className="font-mono text-2xl font-black text-cyan-400">{session.code}</span>
               <StatusBadge status={session.status} />
@@ -129,14 +129,14 @@ export default function ControlPage() {
             target="_blank"
             className="rounded-xl px-4 py-2 text-sm font-bold text-white glass"
           >
-            📺 شاشة العرض
+            📺 Display Screen
           </Link>
           <Link
             href={`/play/${session.code}`}
             target="_blank"
             className="rounded-xl px-4 py-2 text-sm font-bold text-white glass"
           >
-            📱 صفحة اللاعبين
+            📱 Player Page
           </Link>
         </div>
       </div>
@@ -148,15 +148,15 @@ export default function ControlPage() {
           {session.status === 'waiting' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass rounded-3xl p-8 text-center">
               <div className="text-6xl mb-4">⏳</div>
-              <h2 className="text-2xl font-bold text-white mb-2">في انتظار اللاعبين</h2>
-              <p className="text-white/40 mb-6">{players.length} لاعب انضم حتى الآن</p>
+              <h2 className="text-2xl font-bold text-white mb-2">Waiting for Players</h2>
+              <p className="text-white/40 mb-6">{players.length} {players.length === 1 ? 'player' : 'players'} joined so far</p>
               <div
                 className="mx-auto mb-6 rounded-2xl p-4 text-center w-fit"
                 style={{ background: 'rgba(6,182,212,0.1)', border: '1px solid rgba(6,182,212,0.3)' }}
               >
-                <div className="text-xs text-white/40 mb-1">كود الدخول</div>
+                <div className="text-xs text-white/40 mb-1">Join Code</div>
                 <div className="text-5xl font-black text-cyan-400 tracking-widest">{session.code}</div>
-                <div className="text-xs text-white/30 mt-2">على جوالك: {typeof window !== 'undefined' ? window.location.origin : ''}/play/{session.code}</div>
+                <div className="text-xs text-white/30 mt-2">On your phone: {typeof window !== 'undefined' ? window.location.origin : ''}/play/{session.code}</div>
               </div>
               {questions.length > 0 ? (
                 <button
@@ -164,10 +164,10 @@ export default function ControlPage() {
                   className="rounded-2xl px-10 py-4 text-xl font-black text-black transition hover:scale-105"
                   style={{ background: 'linear-gradient(135deg,#22c55e,#16a34a)' }}
                 >
-                  ابدأ اللعبة 🚀
+                  Start Game 🚀
                 </button>
               ) : (
-                <p className="text-yellow-400">⚠️ أضف أسئلة للعبة أولاً</p>
+                <p className="text-yellow-400">⚠️ Add questions to this game first</p>
               )}
             </motion.div>
           )}
@@ -177,10 +177,10 @@ export default function ControlPage() {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass rounded-3xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-white/40 text-sm">
-                  سؤال {qIdx + 1} / {questions.length}
+                  Question {qIdx + 1} / {questions.length}
                 </span>
                 <span className="text-white/40 text-sm">
-                  {answers.length} / {players.length} أجابوا
+                  {answers.length} / {players.length} answered
                 </span>
               </div>
               <h2 className="text-xl font-bold text-white mb-6">{currentQ.text}</h2>
@@ -211,16 +211,16 @@ export default function ControlPage() {
               <div className="flex gap-3">
                 {session.status === 'question' && (
                   <button onClick={revealAnswer} className="flex-1 rounded-2xl py-3 font-bold text-black" style={{ background: '#f59e0b' }}>
-                    كشف الإجابة 👁️
+                    Reveal Answer 👁️
                   </button>
                 )}
                 {session.status === 'revealing' && (
                   <>
                     <button onClick={showLeaderboard} className="flex-1 rounded-2xl py-3 font-bold text-black" style={{ background: '#a855f7' }}>
-                      عرض الترتيب 🏆
+                      Show Standings 🏆
                     </button>
                     <button onClick={nextQuestion} className="flex-1 rounded-2xl py-3 font-bold text-black" style={{ background: hasMore ? '#22c55e' : '#ef4444' }}>
-                      {hasMore ? 'السؤال التالي ▶' : 'إنهاء اللعبة 🏁'}
+                      {hasMore ? 'Next Question ▶' : 'End Game 🏁'}
                     </button>
                   </>
                 )}
@@ -231,11 +231,11 @@ export default function ControlPage() {
           {/* Leaderboard state */}
           {session.status === 'leaderboard' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass rounded-3xl p-6">
-              <h2 className="text-xl font-bold text-white mb-4 text-center">🏆 الترتيب الحالي</h2>
+              <h2 className="text-xl font-bold text-white mb-4 text-center">🏆 Current Standings</h2>
               <Leaderboard players={players} showStats />
               <div className="mt-6 flex gap-3">
                 <button onClick={nextQuestion} className="flex-1 rounded-2xl py-3 font-bold text-black" style={{ background: hasMore ? '#22c55e' : '#ef4444' }}>
-                  {hasMore ? `السؤال التالي (${qIdx + 2}/${questions.length}) ▶` : 'إنهاء اللعبة 🏁'}
+                  {hasMore ? `Next Question (${qIdx + 2}/${questions.length}) ▶` : 'End Game 🏁'}
                 </button>
               </div>
             </motion.div>
@@ -245,7 +245,7 @@ export default function ControlPage() {
           {session.status === 'finished' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass rounded-3xl p-8 text-center">
               <div className="text-6xl mb-4">🎉</div>
-              <h2 className="text-2xl font-black text-white mb-2">انتهت اللعبة!</h2>
+              <h2 className="text-2xl font-black text-white mb-2">Game Over!</h2>
               <Leaderboard players={players} limit={10} showStats />
             </motion.div>
           )}
@@ -254,7 +254,7 @@ export default function ControlPage() {
         {/* Right: live player list */}
         <div className="glass rounded-3xl p-5 h-fit">
           <h3 className="font-bold text-white mb-3">
-            اللاعبون ({players.length})
+            Players ({players.length})
           </h3>
           <div className="flex flex-col gap-2 max-h-[500px] overflow-y-auto">
             {players.map((p) => (
@@ -263,7 +263,7 @@ export default function ControlPage() {
                 <div className="text-cyan-400 font-bold text-sm tabular-nums">{p.score}</div>
               </div>
             ))}
-            {players.length === 0 && <div className="text-white/30 text-sm text-center py-4">لا يوجد لاعبون</div>}
+            {players.length === 0 && <div className="text-white/30 text-sm text-center py-4">No players yet</div>}
           </div>
         </div>
       </div>
@@ -273,11 +273,11 @@ export default function ControlPage() {
 
 function StatusBadge({ status }: { status: Session['status'] }) {
   const map: Record<Session['status'], { label: string; color: string }> = {
-    waiting: { label: 'انتظار', color: '#f59e0b' },
-    question: { label: 'سؤال نشط', color: '#22c55e' },
-    revealing: { label: 'كشف الإجابة', color: '#06b6d4' },
-    leaderboard: { label: 'ليدربورد', color: '#a855f7' },
-    finished: { label: 'منتهية', color: '#6b7280' },
+    waiting: { label: 'Waiting', color: '#f59e0b' },
+    question: { label: 'Live Question', color: '#22c55e' },
+    revealing: { label: 'Revealing', color: '#06b6d4' },
+    leaderboard: { label: 'Leaderboard', color: '#a855f7' },
+    finished: { label: 'Finished', color: '#6b7280' },
   };
   const { label, color } = map[status] ?? { label: status, color: '#fff' };
   return <span className="text-sm font-semibold" style={{ color }}>● {label}</span>;

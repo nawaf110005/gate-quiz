@@ -12,7 +12,9 @@ export default function BuilderPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // New question form state
+  const [timeSetting, setTimeSetting] = useState(10000);
+  const [savingTime, setSavingTime] = useState(false);
+
   const [qText, setQText] = useState('');
   const [optA, setOptA] = useState('');
   const [optB, setOptB] = useState('');
@@ -25,6 +27,7 @@ export default function BuilderPage() {
       supabase.from('questions').select('*').eq('game_id', gameId).order('order_index'),
     ]);
     setGame(gRes.data);
+    if (gRes.data?.time_per_question) setTimeSetting(gRes.data.time_per_question);
     setQuestions(qRes.data ?? []);
     setLoading(false);
   };
@@ -50,27 +53,67 @@ export default function BuilderPage() {
     setSaving(false);
   };
 
+  const saveTimeSetting = async () => {
+    setSavingTime(true);
+    await supabase.from('games').update({ time_per_question: timeSetting }).eq('id', gameId);
+    setSavingTime(false);
+  };
+
   const deleteQuestion = async (id: string) => {
     await supabase.from('questions').delete().eq('id', id);
     setQuestions((prev) => prev.filter((q) => q.id !== id));
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-white/40">جاري التحميل…</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-white/40">Loading…</div>;
 
   return (
     <div className="min-h-screen p-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/admin" className="text-white/40 hover:text-white/70">← الرجوع</Link>
+          <Link href="/admin" className="text-white/40 hover:text-white/70">← Back</Link>
           <div>
             <h1 className="text-2xl font-black text-white">{game?.title}</h1>
-            <p className="text-white/40 text-sm">{questions.length} سؤال</p>
+            <p className="text-white/40 text-sm">{questions.length} {questions.length === 1 ? 'question' : 'questions'}</p>
           </div>
         </div>
         {questions.length > 0 && (
           <StartSessionButton gameId={gameId} />
         )}
+      </div>
+
+      {/* Game Settings */}
+      <div className="glass rounded-2xl p-5 mb-6">
+        <h3 className="font-bold text-white mb-3 text-sm">Game Settings</h3>
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex flex-col gap-1">
+            <label className="text-white/50 text-xs">Time per question (seconds)</label>
+            <div className="flex items-center gap-2">
+              {[5, 10, 15, 20, 30].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setTimeSetting(s * 1000)}
+                  className="rounded-xl px-3 py-1.5 text-sm font-bold transition"
+                  style={{
+                    background: timeSetting === s * 1000 ? '#06b6d4' : 'rgba(6,182,212,0.1)',
+                    color: timeSetting === s * 1000 ? '#000' : '#06b6d4',
+                    border: `1px solid ${timeSetting === s * 1000 ? '#06b6d4' : 'rgba(6,182,212,0.3)'}`,
+                  }}
+                >
+                  {s}s
+                </button>
+              ))}
+              <button
+                onClick={saveTimeSetting}
+                disabled={savingTime}
+                className="rounded-xl px-4 py-1.5 text-sm font-bold text-black disabled:opacity-40 transition"
+                style={{ background: '#22c55e' }}
+              >
+                {savingTime ? '...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Questions list */}
@@ -119,19 +162,19 @@ export default function BuilderPage() {
 
         {questions.length === 0 && (
           <div className="glass rounded-2xl p-8 text-center text-white/30">
-            لا توجد أسئلة بعد — أضف أول سؤال أدناه
+            No questions yet — add the first one below
           </div>
         )}
       </div>
 
       {/* Add question form */}
       <div className="glass rounded-3xl p-6">
-        <h2 className="text-lg font-bold text-white mb-4">إضافة سؤال جديد</h2>
+        <h2 className="text-lg font-bold text-white mb-4">Add New Question</h2>
         <form onSubmit={addQuestion} className="flex flex-col gap-4">
           <textarea
             value={qText}
             onChange={(e) => setQText(e.target.value)}
-            placeholder="نص السؤال"
+            placeholder="Question text"
             rows={2}
             required
             className="w-full rounded-xl px-4 py-3 text-white placeholder-white/30 outline-none resize-none"
@@ -140,22 +183,22 @@ export default function BuilderPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-cyan-400 mb-1 font-semibold">الخيار A</label>
+              <label className="block text-xs text-cyan-400 mb-1 font-semibold">Option A</label>
               <input
                 value={optA}
                 onChange={(e) => setOptA(e.target.value)}
-                placeholder="الخيار الأول"
+                placeholder="First option"
                 required
                 className="w-full rounded-xl px-4 py-3 text-white placeholder-white/30 outline-none"
                 style={{ background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.3)' }}
               />
             </div>
             <div>
-              <label className="block text-xs text-purple-400 mb-1 font-semibold">الخيار B</label>
+              <label className="block text-xs text-purple-400 mb-1 font-semibold">Option B</label>
               <input
                 value={optB}
                 onChange={(e) => setOptB(e.target.value)}
-                placeholder="الخيار الثاني"
+                placeholder="Second option"
                 required
                 className="w-full rounded-xl px-4 py-3 text-white placeholder-white/30 outline-none"
                 style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.3)' }}
@@ -164,7 +207,7 @@ export default function BuilderPage() {
           </div>
 
           <div>
-            <label className="block text-xs text-white/50 mb-2">الإجابة الصحيحة</label>
+            <label className="block text-xs text-white/50 mb-2">Correct Answer</label>
             <div className="flex gap-3">
               {(['A', 'B'] as const).map((c) => (
                 <button
@@ -190,7 +233,7 @@ export default function BuilderPage() {
             className="rounded-2xl py-3 font-bold text-white transition hover:scale-105 disabled:opacity-40"
             style={{ background: 'linear-gradient(135deg,#a855f7,#6b21a8)' }}
           >
-            {saving ? 'جاري الحفظ…' : '+ إضافة السؤال'}
+            {saving ? 'Saving…' : '+ Add Question'}
           </button>
         </form>
       </div>
@@ -203,17 +246,18 @@ function StartSessionButton({ gameId }: { gameId: string }) {
 
   const start = async () => {
     setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
     const { data, error } = await supabase
       .from('sessions')
-      .insert({ game_id: gameId, code, status: 'waiting' })
+      .insert({ game_id: gameId, code, status: 'waiting', user_id: user?.id })
       .select()
       .single();
 
     if (!error && data) {
       window.location.href = `/admin/sessions/${data.id}/control`;
     } else {
-      alert('خطأ في إنشاء الجلسة');
+      alert('Error creating session');
       setLoading(false);
     }
   };
@@ -225,7 +269,7 @@ function StartSessionButton({ gameId }: { gameId: string }) {
       className="rounded-xl px-6 py-3 font-bold text-black transition hover:scale-105 disabled:opacity-40"
       style={{ background: 'linear-gradient(135deg,#22c55e,#16a34a)' }}
     >
-      {loading ? '…' : '▶ بدء جلسة مباشرة'}
+      {loading ? '…' : '▶ Start Live Session'}
     </button>
   );
 }

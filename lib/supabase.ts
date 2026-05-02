@@ -1,7 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// Production Supabase project (gate-quiz, null forge org).
+// Pinned directly so the correct project is always used regardless of
+// any stale values that may exist in the hosting platform env dashboard.
+const supabaseUrl = 'https://wdnkxlucmvrequmqksgv.supabase.co';
+const supabaseAnonKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9' +
+  '.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indkbmt4bHVjbXZyZXF1bXFrc2d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NTc2OTQsImV4cCI6MjA5MzEzMzY5NH0' +
+  '.MmauupyyCHEyPcm4eChJAt3skKigJPiy9Jda-lJ-5mU';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
